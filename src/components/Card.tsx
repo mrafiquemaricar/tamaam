@@ -1,6 +1,7 @@
 import React from 'react';
 import { CardItem } from '../types/game';
 import { Check } from 'lucide-react';
+import { QuranIcon } from './QuranIcons';
 
 interface CardProps {
   card: CardItem;
@@ -19,7 +20,8 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
   const isFlippedOrMatched = card.isFlipped || card.isMatched;
 
   // Granular Container Query & Length-based Font Sizing Helpers
-  const getArabicFontSize = (text: string) => {
+  const getArabicFontSize = (text?: string) => {
+    if (!text) return '';
     const len = text.length;
     if (len > 18) return 'text-[10px] sm:text-xs leading-tight';
     if (len > 13) return 'text-[11px] sm:text-sm leading-tight';
@@ -28,12 +30,21 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
     return 'text-base sm:text-xl leading-snug';
   };
 
-  const getEnglishFontSize = (text: string) => {
+  const getEnglishFontSize = (text?: string) => {
+    if (!text) return '';
     const len = text.length;
     if (len > 22) return 'text-[8px] sm:text-[10px] leading-none font-semibold';
     if (len > 15) return 'text-[9px] sm:text-xs leading-tight font-bold';
     if (len > 9) return 'text-[10px] sm:text-xs leading-tight font-bold';
     return 'text-xs sm:text-sm leading-tight font-extrabold';
+  };
+
+  const getBadgeLabel = () => {
+    if (card.type === 'arabic') return 'AR';
+    if (card.type === 'english') return 'EN';
+    if (card.type.startsWith('symbol')) return 'IMG';
+    if (card.type === 'hybrid_symbol') return 'IMG';
+    return 'WORD';
   };
 
   return (
@@ -44,7 +55,7 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
       }`}
       role="button"
       tabIndex={0}
-      aria-label={`${card.type === 'arabic' ? 'Arabic' : 'English'} card: ${card.mainText}`}
+      aria-label={`Memory card: ${card.mainText || card.iconKey}`}
     >
       <div
         className={`w-full h-full rounded-lg sm:rounded-xl shadow-md transform-style-3d relative ${
@@ -69,21 +80,25 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
           className={`absolute inset-0 w-full h-full rounded-lg sm:rounded-xl border rotate-y-180 backface-hidden p-1 flex flex-col justify-between items-center text-center overflow-hidden transition-all duration-300 relative ${
             card.isMatched
               ? 'bg-gradient-to-b from-emerald-900/95 to-teal-950/95 border-amber-400/80 text-amber-100 animate-match shadow-amber-500/20'
+              : card.iconKey
+              ? 'bg-slate-900/95 border-amber-400/60 text-slate-100 shadow-md'
               : card.type === 'arabic'
               ? 'bg-slate-900/95 border-amber-500/60 text-slate-100 shadow-md'
               : 'bg-slate-900/95 border-teal-500/60 text-slate-100 shadow-md'
           }`}
         >
-          {/* ABSOLUTE FLOATING BADGES (Frees up 100% vertical area for text) */}
+          {/* ABSOLUTE FLOATING BADGES */}
           <div className="absolute top-0.5 left-0.5 z-10">
             <span
               className={`text-[7px] sm:text-[8px] font-bold tracking-tight uppercase px-1 py-0.25 rounded ${
-                card.type === 'arabic'
+                card.iconKey
+                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                  : card.type === 'arabic'
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                   : 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
               }`}
             >
-              {card.type === 'arabic' ? 'AR' : 'EN'}
+              {getBadgeLabel()}
             </span>
           </div>
 
@@ -95,9 +110,18 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
             </div>
           )}
 
-          {/* MAIN WORD CONTAINER (Maximizes interior space) */}
-          <div className="flex-1 w-full flex items-center justify-center px-0.5 pt-3 pb-0.5 min-h-0 text-center">
-            {card.type === 'arabic' ? (
+          {/* MAIN CARD CONTENT (SVG IMAGE OR TEXT) */}
+          <div className="flex-1 w-full flex flex-col items-center justify-center px-0.5 pt-3.5 pb-0.5 min-h-0 text-center">
+            {card.iconKey ? (
+              <div className="flex flex-col items-center justify-center space-y-1 my-auto">
+                <QuranIcon iconKey={card.iconKey} className="w-9 h-9 sm:w-12 sm:h-12 drop-shadow-md hover:scale-105 transition-transform" />
+                {card.mainText && (
+                  <span className="text-[10px] sm:text-xs font-bold text-amber-300 leading-tight">
+                    {card.mainText}
+                  </span>
+                )}
+              </div>
+            ) : card.type === 'arabic' || (card.mainText && /[\u0600-\u06FF]/.test(card.mainText)) ? (
               <span
                 dir="rtl"
                 className={`font-arabic text-amber-200 font-bold drop-shadow-sm select-none break-words max-w-full ${getArabicFontSize(
@@ -117,21 +141,23 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
             )}
           </div>
 
-          {/* SECONDARY SUBTEXT LABEL (Clean Bottom Accent) */}
-          <div className="w-full pt-0.5 border-t border-slate-800/80 shrink-0">
-            {card.type === 'arabic' ? (
-              <span className="block text-[8px] sm:text-[10px] text-slate-400 font-medium leading-tight whitespace-normal break-words px-0.5 max-w-full">
-                {card.subText}
-              </span>
-            ) : (
-              <span
-                dir="rtl"
-                className="block font-arabic text-[9px] sm:text-[11px] text-amber-400/90 font-medium leading-tight whitespace-normal break-words px-0.5 max-w-full"
-              >
-                {card.subText}
-              </span>
-            )}
-          </div>
+          {/* SECONDARY SUBTEXT LABEL */}
+          {card.subText && (
+            <div className="w-full pt-0.5 border-t border-slate-800/80 shrink-0">
+              {/[\u0600-\u06FF]/.test(card.subText) ? (
+                <span
+                  dir="rtl"
+                  className="block font-arabic text-[9px] sm:text-[11px] text-amber-400/90 font-medium leading-tight whitespace-normal break-words px-0.5 max-w-full"
+                >
+                  {card.subText}
+                </span>
+              ) : (
+                <span className="block text-[8px] sm:text-[10px] text-slate-400 font-medium leading-tight whitespace-normal break-words px-0.5 max-w-full">
+                  {card.subText}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

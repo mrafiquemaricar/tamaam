@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { CardItem, GameMode, GameStatus, GameStats } from './types/game';
+import { CardItem, GameMode, GameStatus, GameStats, CardContentType } from './types/game';
 import { generateGameCards } from './data/wordBank';
 import { Header } from './components/Header';
 import { GameBoard } from './components/GameBoard';
@@ -13,6 +13,7 @@ import { loadUserStats, saveGameEndStats, UserStats } from './utils/storage';
 export function App() {
   const [gameStatus, setGameStatus] = useState<GameStatus>('idle');
   const [gameMode, setGameMode] = useState<GameMode>(60);
+  const [cardContentType, setCardContentType] = useState<CardContentType>('quran_vocab');
   const [cards, setCards] = useState<CardItem[]>([]);
   const [isMuted, setIsMuted] = useState<boolean>(soundManager.getIsMuted());
   const [isWordBankOpen, setIsWordBankOpen] = useState<boolean>(false);
@@ -29,9 +30,9 @@ export function App() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Initialize a fresh game session
-  const initGame = useCallback((mode: GameMode = gameMode) => {
+  const initGame = useCallback((mode: GameMode = gameMode, type: CardContentType = cardContentType) => {
     const totalPairs = 12;
-    const newCards = generateGameCards(totalPairs);
+    const newCards = generateGameCards(totalPairs, type);
     setCards(newCards);
     setPairsMatched(0);
     setMismatches(0);
@@ -42,7 +43,7 @@ export function App() {
     const initialTime = mode === 'zen' ? 9999 : (mode as number);
     setTimeRemaining(initialTime);
     setGameStatus('playing');
-  }, [gameMode]);
+  }, [gameMode, cardContentType]);
 
   // Handle Timer Countdown Loop
   useEffect(() => {
@@ -156,8 +157,10 @@ export function App() {
       {gameStatus === 'idle' && (
         <StartScreen
           selectedMode={gameMode}
+          selectedContentType={cardContentType}
           onSelectMode={(mode) => setGameMode(mode)}
-          onStartGame={() => initGame(gameMode)}
+          onSelectContentType={(type) => setCardContentType(type)}
+          onStartGame={() => initGame(gameMode, cardContentType)}
           onOpenWordBank={() => setIsWordBankOpen(true)}
           stats={userStats}
         />
@@ -215,7 +218,7 @@ export function App() {
           stats={stats}
           mode={gameMode}
           cards={cards}
-          onPlayAgain={() => initGame(gameMode)}
+          onPlayAgain={() => initGame(gameMode, cardContentType)}
           onChangeMode={() => setGameStatus('idle')}
         />
       )}

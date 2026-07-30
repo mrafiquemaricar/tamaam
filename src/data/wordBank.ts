@@ -1,4 +1,5 @@
-import { WordPair, CardItem } from '../types/game';
+import { WordPair, CardItem, CardContentType } from '../types/game';
+import { SYMBOL_BANK } from './symbolBank';
 
 export const WORD_BANK: WordPair[] = [
   // ==========================================
@@ -238,38 +239,103 @@ export const WORD_BANK: WordPair[] = [
 ];
 
 /**
- * Utility to generate a randomized 24-card set (12 pairs) for a game session
+ * Universal Card Generator supporting Quran Vocab, Visual Symbols (Images Only), and Hybrid Image-Word Mode
  */
-export function generateGameCards(pairCount: number = 12): CardItem[] {
-  // Fisher-Yates shuffle helper
-  const shuffledBank = [...WORD_BANK].sort(() => Math.random() - 0.5);
-  const selectedPairs = shuffledBank.slice(0, pairCount);
-
+export function generateGameCards(
+  pairCount: number = 12,
+  contentType: CardContentType = 'quran_vocab'
+): CardItem[] {
   const cards: CardItem[] = [];
 
-  selectedPairs.forEach((pair) => {
-    // 1. Arabic card: main = Arabic, sub = English
-    cards.push({
-      id: `${pair.id}-ar`,
-      pairId: pair.id,
-      type: 'arabic',
-      mainText: pair.arabic,
-      subText: pair.english,
-      isFlipped: false,
-      isMatched: false
-    });
+  if (contentType === 'visual_symbols') {
+    // 🎨 MODE 2: VISUAL SYMBOLS (IMAGES ONLY)
+    const shuffledSymbols = [...SYMBOL_BANK].sort(() => Math.random() - 0.5);
+    const selectedSymbols = shuffledSymbols.slice(0, pairCount);
 
-    // 2. English card: main = English, sub = Arabic
-    cards.push({
-      id: `${pair.id}-en`,
-      pairId: pair.id,
-      type: 'english',
-      mainText: pair.english,
-      subText: pair.arabic,
-      isFlipped: false,
-      isMatched: false
+    selectedSymbols.forEach((sym) => {
+      // Symbol Card A (Image with English subtext)
+      cards.push({
+        id: `${sym.id}-syma`,
+        pairId: sym.id,
+        type: 'symbol_a',
+        iconKey: sym.iconKey,
+        mainText: sym.name,
+        subText: sym.englishLabel,
+        accentColor: sym.color,
+        isFlipped: false,
+        isMatched: false,
+      });
+
+      // Symbol Card B (Image with Arabic subtext)
+      cards.push({
+        id: `${sym.id}-symb`,
+        pairId: sym.id,
+        type: 'symbol_b',
+        iconKey: sym.iconKey,
+        mainText: sym.name,
+        subText: sym.arabicLabel,
+        accentColor: sym.color,
+        isFlipped: false,
+        isMatched: false,
+      });
     });
-  });
+  } else if (contentType === 'hybrid') {
+    // 🌟 MODE 3: HYBRID (IMAGE CARD <-> WORD CARD)
+    const shuffledSymbols = [...SYMBOL_BANK].sort(() => Math.random() - 0.5);
+    const selectedSymbols = shuffledSymbols.slice(0, pairCount);
+
+    selectedSymbols.forEach((sym) => {
+      // Image Icon Card
+      cards.push({
+        id: `${sym.id}-hyb-img`,
+        pairId: sym.id,
+        type: 'hybrid_symbol',
+        iconKey: sym.iconKey,
+        mainText: sym.name,
+        subText: sym.englishLabel,
+        accentColor: sym.color,
+        isFlipped: false,
+        isMatched: false,
+      });
+
+      // Quranic Word Card
+      cards.push({
+        id: `${sym.id}-hyb-wrd`,
+        pairId: sym.id,
+        type: 'hybrid_word',
+        mainText: sym.arabicLabel,
+        subText: sym.englishLabel,
+        isFlipped: false,
+        isMatched: false,
+      });
+    });
+  } else {
+    // 📖 MODE 1: QURANIC VOCABULARY (TEXT WORDS)
+    const shuffledBank = [...WORD_BANK].sort(() => Math.random() - 0.5);
+    const selectedPairs = shuffledBank.slice(0, pairCount);
+
+    selectedPairs.forEach((pair) => {
+      cards.push({
+        id: `${pair.id}-ar`,
+        pairId: pair.id,
+        type: 'arabic',
+        mainText: pair.arabic,
+        subText: pair.english,
+        isFlipped: false,
+        isMatched: false,
+      });
+
+      cards.push({
+        id: `${pair.id}-en`,
+        pairId: pair.id,
+        type: 'english',
+        mainText: pair.english,
+        subText: pair.arabic,
+        isFlipped: false,
+        isMatched: false,
+      });
+    });
+  }
 
   // Shuffle final 24 cards
   return cards.sort(() => Math.random() - 0.5);
