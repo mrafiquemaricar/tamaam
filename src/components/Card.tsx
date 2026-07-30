@@ -120,13 +120,13 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
           {/* SECONDARY SUBTEXT LABEL (Clean Bottom Accent) */}
           <div className="w-full pt-0.5 border-t border-slate-800/80 shrink-0">
             {card.type === 'arabic' ? (
-              <span className="block text-[8px] sm:text-[10px] text-slate-400 font-medium truncate px-0.5">
+              <span className="block text-[8px] sm:text-[10px] text-slate-400 font-medium leading-tight whitespace-normal break-words px-0.5 max-w-full">
                 {card.subText}
               </span>
             ) : (
               <span
                 dir="rtl"
-                className="block font-arabic text-[9px] sm:text-[11px] text-amber-400/90 font-medium truncate px-0.5"
+                className="block font-arabic text-[9px] sm:text-[11px] text-amber-400/90 font-medium leading-tight whitespace-normal break-words px-0.5 max-w-full"
               >
                 {card.subText}
               </span>
