@@ -98,14 +98,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+    <div className="w-full h-full flex items-center justify-center p-1 sm:p-3 overflow-hidden">
       {/* 
         Responsive Viewport Grid:
         Portrait (default): 4 columns x 6 rows
         Landscape / Wide: 6 columns x 4 rows
         Calculates max height so the board never requires page scroll!
       */}
-      <div className="w-full h-full max-w-2xl max-h-[calc(100vh-80px)] grid grid-cols-4 portrait:grid-cols-4 landscape:grid-cols-6 gap-2 sm:gap-3 justify-items-center items-center">
+      <div className="w-full h-full max-w-2xl max-h-[calc(100vh-70px)] grid grid-cols-4 portrait:grid-cols-4 landscape:grid-cols-6 gap-1.5 sm:gap-2.5 justify-items-center items-center">
         {cards.map((card) => (
           <div key={card.id} className="w-full h-full min-h-0 flex items-center justify-center">
             <Card
