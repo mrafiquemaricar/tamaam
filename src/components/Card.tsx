@@ -58,44 +58,42 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
       aria-label={`Memory card: ${card.mainText || card.iconKey}`}
     >
       <div
-        className={`w-full h-full rounded-lg sm:rounded-xl shadow-md transform-style-3d relative ${
+        className={`w-full h-full rounded-xl transform-style-3d relative ${
           isFlippedOrMatched ? 'rotate-y-180' : ''
         } ${isShaking ? 'animate-shake' : ''}`}
       >
-        {/* ================= CARD BACK (Face Down) ================= */}
-        <div className="absolute inset-0 w-full h-full rounded-lg sm:rounded-xl bg-islamic-pattern border border-amber-500/40 shadow-inner flex items-center justify-center backface-hidden overflow-hidden group">
-          {/* Subtle Golden Inner Border */}
-          <div className="absolute inset-1 border border-amber-400/30 rounded pointer-events-none" />
+        {/* ================= CARD BACK (Face Down - Flat & Minimal) ================= */}
+        <div className="absolute inset-0 w-full h-full rounded-xl bg-slate-800 border border-slate-700/80 flex items-center justify-center backface-hidden overflow-hidden group">
+          {/* Subtle Flat Corner Accents */}
+          <div className="absolute inset-1 border border-slate-700/40 rounded-lg pointer-events-none" />
 
-          {/* Central Emblem */}
-          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-emerald-900/90 border border-amber-400/60 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 fill-amber-400/20" viewBox="0 0 24 24">
-              <path d="M12 2L14.5 8.5L21 9L16 13.5L18 20L12 16L6 20L8 13.5L3 9L9.5 8.5L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          {/* Central Flat Emblem */}
+          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center transition-transform group-hover:scale-105">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-sm bg-indigo-500/80 transform rotate-45" />
           </div>
         </div>
 
-        {/* ================= CARD FRONT (Face Up) ================= */}
+        {/* ================= CARD FRONT (Face Up - Flat & Contemporary) ================= */}
         <div
-          className={`absolute inset-0 w-full h-full rounded-lg sm:rounded-xl border rotate-y-180 backface-hidden p-1 flex flex-col justify-between items-center text-center overflow-hidden transition-all duration-300 relative ${
+          className={`absolute inset-0 w-full h-full rounded-xl border rotate-y-180 backface-hidden p-1 flex flex-col justify-between items-center text-center overflow-hidden transition-all duration-200 relative ${
             card.isMatched
-              ? 'bg-gradient-to-b from-emerald-900/95 to-teal-950/95 border-amber-400/80 text-amber-100 animate-match shadow-amber-500/20'
-              : card.iconKey
-              ? 'bg-slate-900/95 border-amber-400/60 text-slate-100 shadow-md'
+              ? 'bg-emerald-950/90 border-2 border-emerald-400 text-emerald-100 animate-match'
               : card.type === 'arabic'
-              ? 'bg-slate-900/95 border-amber-500/60 text-slate-100 shadow-md'
-              : 'bg-slate-900/95 border-teal-500/60 text-slate-100 shadow-md'
+              ? 'bg-slate-900 border-2 border-amber-500/50 text-slate-100'
+              : card.iconKey
+              ? 'bg-slate-900 border-2 border-purple-500/50 text-slate-100'
+              : 'bg-slate-900 border-2 border-indigo-500/50 text-slate-100'
           }`}
         >
           {/* ABSOLUTE FLOATING BADGES */}
-          <div className="absolute top-0.5 left-0.5 z-10">
+          <div className="absolute top-1 left-1 z-10">
             <span
-              className={`text-[7px] sm:text-[8px] font-bold tracking-tight uppercase px-1 py-0.25 rounded ${
-                card.iconKey
-                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
-                  : card.type === 'arabic'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
+              className={`text-[8px] sm:text-[9px] font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded-md ${
+                card.type === 'arabic'
+                  ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                  : card.iconKey
+                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                  : 'bg-indigo-500/15 text-indigo-300 border border-indigo-500/30'
               }`}
             >
               {getBadgeLabel()}
@@ -103,20 +101,20 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
           </div>
 
           {card.isMatched && (
-            <div className="absolute top-0.5 right-0.5 z-10">
-              <span className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-amber-400 text-emerald-950 flex items-center justify-center font-bold shadow-sm">
-                <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
+            <div className="absolute top-1 right-1 z-10">
+              <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-400 text-slate-950 flex items-center justify-center font-bold">
+                <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />
               </span>
             </div>
           )}
 
-          {/* MAIN CARD CONTENT (SVG IMAGE OR TEXT) */}
-          <div className="flex-1 w-full flex flex-col items-center justify-center px-0.5 pt-3.5 pb-0.5 min-h-0 text-center">
+          {/* MAIN CARD CONTENT */}
+          <div className="flex-1 w-full flex flex-col items-center justify-center px-1 pt-4 pb-1 min-h-0 text-center">
             {card.iconKey ? (
               <div className="flex flex-col items-center justify-center space-y-1 my-auto">
-                <QuranIcon iconKey={card.iconKey} className="w-9 h-9 sm:w-12 sm:h-12 drop-shadow-md hover:scale-105 transition-transform" />
+                <QuranIcon iconKey={card.iconKey} className="w-9 h-9 sm:w-12 sm:h-12" />
                 {card.mainText && (
-                  <span className="text-[10px] sm:text-xs font-bold text-amber-300 leading-tight">
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-200 leading-tight">
                     {card.mainText}
                   </span>
                 )}
@@ -124,7 +122,7 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
             ) : card.type === 'arabic' || (card.mainText && /[\u0600-\u06FF]/.test(card.mainText)) ? (
               <span
                 dir="rtl"
-                className={`font-arabic text-amber-200 font-bold drop-shadow-sm select-none break-words max-w-full ${getArabicFontSize(
+                className={`font-arabic text-amber-300 font-bold select-none break-words max-w-full ${getArabicFontSize(
                   card.mainText
                 )}`}
               >
@@ -132,7 +130,7 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
               </span>
             ) : (
               <span
-                className={`font-sans text-slate-100 drop-shadow-sm select-none break-words max-w-full ${getEnglishFontSize(
+                className={`font-sans text-slate-100 select-none break-words max-w-full ${getEnglishFontSize(
                   card.mainText
                 )}`}
               >
@@ -143,7 +141,7 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
 
           {/* SECONDARY SUBTEXT LABEL */}
           {card.subText && (
-            <div className="w-full pt-0.5 border-t border-slate-800/80 shrink-0">
+            <div className="w-full pt-1 border-t border-slate-800 shrink-0">
               {/[\u0600-\u06FF]/.test(card.subText) ? (
                 <span
                   dir="rtl"
