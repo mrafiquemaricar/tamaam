@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { CardItem } from '../types/game';
+import { CardItem, ThemeMode } from '../types/game';
 import { Card } from './Card';
 import { soundManager } from '../utils/sound';
 import { triggerHaptic, hapticPatterns } from '../utils/haptics';
 
 interface GameBoardProps {
   cards: CardItem[];
+  theme: ThemeMode;
   onMatch: (pairId: string) => void;
   onMismatch: () => void;
   isPaused: boolean;
@@ -13,6 +14,7 @@ interface GameBoardProps {
 
 export const GameBoard: React.FC<GameBoardProps> = ({
   cards: initialCards,
+  theme,
   onMatch,
   onMismatch,
   isPaused,
@@ -99,17 +101,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <div className="w-full h-full flex items-center justify-center p-1 sm:p-3 overflow-hidden">
-      {/* 
-        Responsive Viewport Grid:
-        Portrait (default): 4 columns x 6 rows
-        Landscape / Wide: 6 columns x 4 rows
-        Calculates max height so the board never requires page scroll!
-      */}
       <div className="w-full h-full max-w-2xl max-h-[calc(100vh-70px)] grid grid-cols-4 portrait:grid-cols-4 landscape:grid-cols-6 gap-1.5 sm:gap-2.5 justify-items-center items-center">
         {cards.map((card) => (
           <div key={card.id} className="w-full h-full min-h-0 flex items-center justify-center">
             <Card
               card={card}
+              theme={theme}
               isShaking={shakingCardIds.includes(card.id)}
               onCardClick={handleCardClick}
               disabled={isEvaluating || isPaused || card.isMatched || card.isFlipped}

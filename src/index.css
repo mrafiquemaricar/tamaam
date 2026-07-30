@@ -9,8 +9,6 @@
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #0f172a;
-    color: #f8fafc;
   }
 }
 
@@ -39,8 +37,14 @@
   transform: rotateY(180deg);
 }
 
-/* Flat Minimalist Card Back Pattern */
-.bg-flat-pattern {
+/* Flat Card Back Patterns */
+.bg-flat-pattern-light {
+  background-color: #f1f5f9;
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+
+.bg-flat-pattern-dark {
   background-color: #1e293b;
   background-image: radial-gradient(#334155 1px, transparent 1px);
   background-size: 12px 12px;
@@ -68,7 +72,13 @@
   animation: shake 0.35s ease-in-out;
 }
 
-/* Flat Neutral App Background */
-.bg-flat-app {
+/* Flat App Backgrounds */
+.bg-app-light {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.bg-app-dark {
   background-color: #090d16;
+  color: #f8fafc;
 }

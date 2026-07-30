@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { CardItem, GameMode, GameStatus, GameStats, CardContentType } from './types/game';
+import { CardItem, GameMode, GameStatus, GameStats, CardContentType, ThemeMode } from './types/game';
 import { generateGameCards } from './data/wordBank';
 import { Header } from './components/Header';
 import { GameBoard } from './components/GameBoard';
@@ -11,6 +11,11 @@ import { hapticPatterns, triggerHaptic } from './utils/haptics';
 import { loadUserStats, saveGameEndStats, UserStats } from './utils/storage';
 
 export function App() {
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem('tamaam_theme');
+    return (saved === 'dark' || saved === 'light') ? saved : 'light'; // DEFAULT TO LIGHT MODE!
+  });
+
   const [gameStatus, setGameStatus] = useState<GameStatus>('idle');
   const [gameMode, setGameMode] = useState<GameMode>(60);
   const [cardContentType, setCardContentType] = useState<CardContentType>('quran_vocab');
@@ -18,6 +23,15 @@ export function App() {
   const [isMuted, setIsMuted] = useState<boolean>(soundManager.getIsMuted());
   const [isWordBankOpen, setIsWordBankOpen] = useState<boolean>(false);
   const [userStats, setUserStats] = useState<UserStats>(loadUserStats());
+
+  // Toggle Theme Function
+  const handleToggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      localStorage.setItem('tamaam_theme', next);
+      return next;
+    });
+  };
 
   // Round Gameplay Metrics
   const [pairsMatched, setPairsMatched] = useState<number>(0);
@@ -148,18 +162,30 @@ export function App() {
     accuracy,
   };
 
+  const isLight = theme === 'light';
+
   return (
-    <div className="w-full h-full flex flex-col bg-mesh-radial text-slate-100 overflow-hidden relative font-sans">
+    <div
+      className={`w-full h-full flex flex-col overflow-hidden relative font-sans transition-colors ${
+        isLight ? 'bg-app-light text-slate-900' : 'bg-app-dark text-slate-100'
+      }`}
+    >
       {/* Background Subtle Geometric Watermark */}
-      <div className="absolute inset-0 bg-islamic-pattern opacity-10 pointer-events-none" />
+      <div
+        className={`absolute inset-0 opacity-5 pointer-events-none ${
+          isLight ? 'bg-flat-pattern-light' : 'bg-flat-pattern-dark'
+        }`}
+      />
 
       {/* IDLE / START SCREEN */}
       {gameStatus === 'idle' && (
         <StartScreen
           selectedMode={gameMode}
           selectedContentType={cardContentType}
+          theme={theme}
           onSelectMode={(mode) => setGameMode(mode)}
           onSelectContentType={(type) => setCardContentType(type)}
+          onToggleTheme={handleToggleTheme}
           onStartGame={() => initGame(gameMode, cardContentType)}
           onOpenWordBank={() => setIsWordBankOpen(true)}
           stats={userStats}
@@ -172,8 +198,10 @@ export function App() {
           <Header
             stats={stats}
             mode={gameMode}
+            theme={theme}
             isPaused={gameStatus === 'paused'}
             isMuted={isMuted}
+            onToggleTheme={handleToggleTheme}
             onTogglePause={handleTogglePause}
             onToggleMute={handleToggleMute}
             onRestart={() => setGameStatus('idle')}
@@ -182,6 +210,7 @@ export function App() {
           <main className="flex-1 relative min-h-0 overflow-hidden">
             <GameBoard
               cards={cards}
+              theme={theme}
               onMatch={handleMatch}
               onMismatch={handleMismatch}
               isPaused={gameStatus === 'paused'}
@@ -189,19 +218,23 @@ export function App() {
 
             {/* PAUSE OVERLAY */}
             {gameStatus === 'paused' && (
-              <div className="absolute inset-0 z-30 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center p-6 space-y-4">
-                <h3 className="text-2xl font-bold text-amber-300">Game Paused</h3>
-                <p className="text-xs text-slate-400">Take a breath & resume whenever you're ready.</p>
+              <div
+                className={`absolute inset-0 z-30 flex flex-col items-center justify-center p-6 space-y-4 backdrop-blur-xs ${
+                  isLight ? 'bg-slate-900/60 text-white' : 'bg-slate-950/80 text-slate-100'
+                }`}
+              >
+                <h3 className="text-2xl font-bold text-amber-400">Game Paused</h3>
+                <p className="text-xs text-slate-200">Take a breath & resume whenever you're ready.</p>
                 <div className="flex space-x-3 pt-2">
                   <button
                     onClick={() => setGameStatus('idle')}
-                    className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs"
+                    className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700"
                   >
                     Main Menu
                   </button>
                   <button
                     onClick={handleTogglePause}
-                    className="py-2.5 px-6 rounded-xl bg-amber-500 hover:bg-amber-400 text-emerald-950 font-black text-xs shadow-lg"
+                    className="py-2.5 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow-md border border-indigo-500"
                   >
                     Resume Game
                   </button>
@@ -218,6 +251,7 @@ export function App() {
           stats={stats}
           mode={gameMode}
           cards={cards}
+          theme={theme}
           onPlayAgain={() => initGame(gameMode, cardContentType)}
           onChangeMode={() => setGameStatus('idle')}
         />
@@ -225,7 +259,7 @@ export function App() {
 
       {/* DICTIONARY / WORD BANK MODAL */}
       {isWordBankOpen && (
-        <WordBankModal onClose={() => setIsWordBankOpen(false)} />
+        <WordBankModal theme={theme} onClose={() => setIsWordBankOpen(false)} />
       )}
     </div>
   );

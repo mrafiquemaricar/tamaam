@@ -2,6 +2,8 @@ export type CategoryType = 'noun' | 'verb' | 'particle' | 'prophet';
 
 export type CardContentType = 'quran_vocab' | 'visual_symbols' | 'hybrid';
 
+export type ThemeMode = 'light' | 'dark';
+
 export interface WordPair {
   id: string;
   arabic: string;
@@ -17,7 +19,7 @@ export interface SymbolPair {
   arabicLabel: string;
   englishLabel: string;
   iconKey: string;
-  color: string; // Tailored accent color
+  color: string;
 }
 
 export type CardType = 'arabic' | 'english' | 'symbol_a' | 'symbol_b' | 'hybrid_symbol' | 'hybrid_word';

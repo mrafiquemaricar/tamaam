@@ -1,16 +1,19 @@
 import React from 'react';
-import { CardItem } from '../types/game';
+import { CardItem, ThemeMode } from '../types/game';
 import { Check } from 'lucide-react';
 import { QuranIcon } from './QuranIcons';
 
 interface CardProps {
   card: CardItem;
+  theme: ThemeMode;
   isShaking: boolean;
   onCardClick: (card: CardItem) => void;
   disabled: boolean;
 }
 
-export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabled }) => {
+export const Card: React.FC<CardProps> = ({ card, theme, isShaking, onCardClick, disabled }) => {
+  const isLight = theme === 'light';
+
   const handleClick = () => {
     if (!disabled && !card.isFlipped && !card.isMatched) {
       onCardClick(card);
@@ -62,26 +65,50 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
           isFlippedOrMatched ? 'rotate-y-180' : ''
         } ${isShaking ? 'animate-shake' : ''}`}
       >
-        {/* ================= CARD BACK (Face Down - Flat & Minimal) ================= */}
-        <div className="absolute inset-0 w-full h-full rounded-xl bg-slate-800 border border-slate-700/80 flex items-center justify-center backface-hidden overflow-hidden group">
+        {/* ================= CARD BACK (Face Down) ================= */}
+        <div
+          className={`absolute inset-0 w-full h-full rounded-xl border flex items-center justify-center backface-hidden overflow-hidden group ${
+            isLight
+              ? 'bg-slate-100 border-slate-300 shadow-sm'
+              : 'bg-slate-800 border-slate-700/80 shadow-md'
+          }`}
+        >
           {/* Subtle Flat Corner Accents */}
-          <div className="absolute inset-1 border border-slate-700/40 rounded-lg pointer-events-none" />
+          <div
+            className={`absolute inset-1 border rounded-lg pointer-events-none ${
+              isLight ? 'border-slate-200' : 'border-slate-700/40'
+            }`}
+          />
 
           {/* Central Flat Emblem */}
-          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center transition-transform group-hover:scale-105">
-            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-sm bg-indigo-500/80 transform rotate-45" />
+          <div
+            className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg border flex items-center justify-center transition-transform group-hover:scale-105 ${
+              isLight
+                ? 'bg-white border-slate-300 shadow-xs'
+                : 'bg-slate-900 border-slate-700'
+            }`}
+          >
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-sm bg-indigo-600 transform rotate-45" />
           </div>
         </div>
 
-        {/* ================= CARD FRONT (Face Up - Flat & Contemporary) ================= */}
+        {/* ================= CARD FRONT (Face Up) ================= */}
         <div
           className={`absolute inset-0 w-full h-full rounded-xl border rotate-y-180 backface-hidden p-1 flex flex-col justify-between items-center text-center overflow-hidden transition-all duration-200 relative ${
             card.isMatched
-              ? 'bg-emerald-950/90 border-2 border-emerald-400 text-emerald-100 animate-match'
+              ? isLight
+                ? 'bg-emerald-50 border-2 border-emerald-500 text-emerald-950 animate-match shadow-sm'
+                : 'bg-emerald-950/90 border-2 border-emerald-400 text-emerald-100 animate-match'
               : card.type === 'arabic'
-              ? 'bg-slate-900 border-2 border-amber-500/50 text-slate-100'
+              ? isLight
+                ? 'bg-white border-2 border-amber-400 text-slate-900 shadow-sm'
+                : 'bg-slate-900 border-2 border-amber-500/50 text-slate-100'
               : card.iconKey
-              ? 'bg-slate-900 border-2 border-purple-500/50 text-slate-100'
+              ? isLight
+                ? 'bg-white border-2 border-purple-400 text-slate-900 shadow-sm'
+                : 'bg-slate-900 border-2 border-purple-500/50 text-slate-100'
+              : isLight
+              ? 'bg-white border-2 border-indigo-400 text-slate-900 shadow-sm'
               : 'bg-slate-900 border-2 border-indigo-500/50 text-slate-100'
           }`}
         >
@@ -90,9 +117,15 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
             <span
               className={`text-[8px] sm:text-[9px] font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded-md ${
                 card.type === 'arabic'
-                  ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                  ? isLight
+                    ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                    : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
                   : card.iconKey
-                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                  ? isLight
+                    ? 'bg-purple-100 text-purple-800 border border-purple-300'
+                    : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                  : isLight
+                  ? 'bg-indigo-100 text-indigo-800 border border-indigo-300'
                   : 'bg-indigo-500/15 text-indigo-300 border border-indigo-500/30'
               }`}
             >
@@ -102,7 +135,7 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
 
           {card.isMatched && (
             <div className="absolute top-1 right-1 z-10">
-              <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-400 text-slate-950 flex items-center justify-center font-bold">
+              <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold shadow-sm">
                 <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />
               </span>
             </div>
@@ -114,7 +147,11 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
               <div className="flex flex-col items-center justify-center space-y-1 my-auto">
                 <QuranIcon iconKey={card.iconKey} className="w-9 h-9 sm:w-12 sm:h-12" />
                 {card.mainText && (
-                  <span className="text-[10px] sm:text-xs font-bold text-slate-200 leading-tight">
+                  <span
+                    className={`text-[10px] sm:text-xs font-bold leading-tight ${
+                      isLight ? 'text-slate-800' : 'text-slate-200'
+                    }`}
+                  >
                     {card.mainText}
                   </span>
                 )}
@@ -122,17 +159,17 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
             ) : card.type === 'arabic' || (card.mainText && /[\u0600-\u06FF]/.test(card.mainText)) ? (
               <span
                 dir="rtl"
-                className={`font-arabic text-amber-300 font-bold select-none break-words max-w-full ${getArabicFontSize(
-                  card.mainText
-                )}`}
+                className={`font-arabic font-bold select-none break-words max-w-full ${
+                  isLight ? 'text-amber-800' : 'text-amber-300'
+                } ${getArabicFontSize(card.mainText)}`}
               >
                 {card.mainText}
               </span>
             ) : (
               <span
-                className={`font-sans text-slate-100 select-none break-words max-w-full ${getEnglishFontSize(
-                  card.mainText
-                )}`}
+                className={`font-sans font-extrabold select-none break-words max-w-full ${
+                  isLight ? 'text-slate-900' : 'text-slate-100'
+                } ${getEnglishFontSize(card.mainText)}`}
               >
                 {card.mainText}
               </span>
@@ -141,16 +178,26 @@ export const Card: React.FC<CardProps> = ({ card, isShaking, onCardClick, disabl
 
           {/* SECONDARY SUBTEXT LABEL */}
           {card.subText && (
-            <div className="w-full pt-1 border-t border-slate-800 shrink-0">
+            <div
+              className={`w-full pt-1 border-t shrink-0 ${
+                isLight ? 'border-slate-200' : 'border-slate-800'
+              }`}
+            >
               {/[\u0600-\u06FF]/.test(card.subText) ? (
                 <span
                   dir="rtl"
-                  className="block font-arabic text-[9px] sm:text-[11px] text-amber-400/90 font-medium leading-tight whitespace-normal break-words px-0.5 max-w-full"
+                  className={`block font-arabic font-bold leading-tight whitespace-normal break-words px-0.5 max-w-full ${
+                    isLight ? 'text-amber-700' : 'text-amber-400/90'
+                  } text-[9px] sm:text-[11px]`}
                 >
                   {card.subText}
                 </span>
               ) : (
-                <span className="block text-[8px] sm:text-[10px] text-slate-400 font-medium leading-tight whitespace-normal break-words px-0.5 max-w-full">
+                <span
+                  className={`block text-[8px] sm:text-[10px] font-semibold leading-tight whitespace-normal break-words px-0.5 max-w-full ${
+                    isLight ? 'text-slate-500' : 'text-slate-400'
+                  }`}
+                >
                   {card.subText}
                 </span>
               )}
